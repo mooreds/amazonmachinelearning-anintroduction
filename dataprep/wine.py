@@ -1,11 +1,14 @@
 # Prep script for the data found at https://archive.ics.uci.edu/ml/datasets/Wine+Quality
 
+import re
+
 def fix_for_batch(line):
-  # remove last field
-  line = line[:-3] + "\n"
+  # remove last field, as that is our target field
+  p = re.compile(',[^,]*$')
+  line = p.sub("\n", line)
   return line
 
-training_number_of_lines = 4000
+training_number_of_lines = 3898
 tobatch = open('whitetotest.csv', 'w') 
 totrain = open('whitetotrain.csv', 'w') 
 with open('winequality-white.csv') as f:
