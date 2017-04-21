@@ -30,7 +30,7 @@ def fix_for_batch(line):
 training_number_of_lines = 400
 tobatch = open('housingtotest.csv', 'w') 
 totrain = open('housingtotrain.csv', 'w') 
-headerline = "CRIM,ZN,INDUS,CHAS,NOX,RM,AGE,DIS,RAD,TAX,PTRATIO,B,LSTAT,LSTAT,MEDV\n"
+headerline = "CRIM,ZN,INDUS,CHAS,NOX,RM,AGE,DIS,RAD,TAX,PTRATIO,B,LSTAT,MEDV\n"
 with open('housing.data') as f:
   content = f.readlines()
   idx = 0
