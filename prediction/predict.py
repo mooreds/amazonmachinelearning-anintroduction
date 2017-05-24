@@ -4,9 +4,7 @@ client = boto3.client('machinelearning')
 
 res = client.describe_ml_models(FilterVariable='Name', EQ='ML model: Adult V2')
 
-#print res['Results'][0]['MLModelId']
 our_id = res['Results'][0]['MLModelId']
-#print res['Results'][0]['EndpointInfo']
 endpoint_url = res['Results'][0]['EndpointInfo']['EndpointUrl']
 
 # from http://stackoverflow.com/questions/11918909/how-do-i-create-a-dictionary-from-two-parallel-strings
