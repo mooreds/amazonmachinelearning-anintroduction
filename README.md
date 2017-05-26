@@ -2,6 +2,8 @@ Code for Amazon Machine Learning: An Introduction
 
 https://leanpub.com/amazonmachinelearning-anintroduction/
 
+And a video course (URL, TBD).
+
 Make sure you install boto3
 
 `pip install boto3`
