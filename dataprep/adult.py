@@ -25,9 +25,12 @@ def fix_for_batch(line):
   line = p.sub("\n", line)
   return line
 
-training_number_of_lines = 32000
+training_number_of_lines = 20000
+training_number_of_lines_v2 = 12000
+total_training_number_of_lines = training_number_of_lines + training_number_of_lines_v2 
 tobatch = open('adulttotest.csv', 'w') 
 totrain = open('adulttotrain.csv', 'w') 
+totrainv2 = open('adulttotrainv2.csv', 'w') 
 headerline = "age, workclass, fnlwgt, education, education-num, marital-status, occupation, relationship, race, sex, capital-gain, capital-loss, hours-per-week, native-country, income-greater-50k\n"
 
 with open('adult.data') as f:
@@ -37,6 +40,7 @@ with open('adult.data') as f:
   greater_than_50_str = '>50K'
 
   headerfortrainwritten = False
+  headerfortrainv2written = False
   headerforbatchwritten = False
   update_boolean_false = re.compile(less_than_50_str)
   update_boolean_true = re.compile(greater_than_50_str)
@@ -46,7 +50,12 @@ with open('adult.data') as f:
     if not headerfortrainwritten:
       totrain.write(headerline)
       headerfortrainwritten = True
-    if idx > training_number_of_lines:
+    if idx > training_number_of_lines and idx <= total_training_number_of_lines:
+      if not headerfortrainv2written:
+        totrainv2.write(headerline)
+        headerfortrainv2written = True
+      totrainv2.write(line)
+    if idx > total_training_number_of_lines:
       if not headerforbatchwritten:
         # make sure both batch and training have same headers
         tobatch.write(fix_for_batch(headerline))
