@@ -2,9 +2,10 @@ import boto3
 
 client = boto3.client('machinelearning')
 
-res = client.describe_ml_models(FilterVariable='Name', EQ='ML model: Adult V2')
+model_name = 'ML model: Adult V4'
+res = client.describe_ml_models(FilterVariable='Name', EQ=model_name)
 
-our_id = res['Results'][0]['MLModelId']
+model_id = res['Results'][0]['MLModelId']
 endpoint_url = res['Results'][0]['EndpointInfo']['EndpointUrl']
 
 # from http://stackoverflow.com/questions/11918909/how-do-i-create-a-dictionary-from-two-parallel-strings
@@ -15,7 +16,7 @@ values = vals_str.split(',')
 output_dict = dict(zip(keys, values))
 
 response = client.predict(
-  MLModelId=our_id,
+  MLModelId=model_id,
   Record=output_dict,
   PredictEndpoint=endpoint_url 
 )
