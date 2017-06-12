@@ -1,0 +1,18 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1494369167000",
+            "Effect": "Allow",
+            "Action": [
+                "s3:*"
+            ],
+            "Resource": [
+                "arn:aws:s3:::aml-an-intro/batch-prediction-upload",
+                "arn:aws:s3:::aml-an-intro/batch-prediction-results",
+                "arn:aws:s3:::aml-an-intro/batch-prediction-upload/*",
+                "arn:aws:s3:::aml-an-intro/batch-prediction-results/*"
+            ]
+        }
+    ]
+}
