@@ -1,0 +1,15 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1497289144000",
+            "Effect": "Allow",
+            "Action": [
+                "machinelearning:CreateDataSourceFromS3"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}
