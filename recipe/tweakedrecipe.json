@@ -1,0 +1,22 @@
+{
+  "groups": {
+    "into_5_bins": "group('hours-per-week','age')",
+    "NUMERIC_VARS_QB_10": "group('education-num','hours-per-week','age')",
+    "NUMERIC_VARS_QB_500": "group('capital-loss','capital-gain','fnlwgt')",
+    "numeric_vars_without_fnlgwt": "group_remove('ALL_NUMERIC','fnlwgt')"
+  },
+  "assignments": {
+     "capgain_to_use": "normalize(capital-gain)",
+     "binned_hours_per_week": "quantile_bin(hours-per-week,40)",
+     "cartesian_hours_marital_status": "cartesian(binned_hours_per_week,marital-status)"
+  },
+  "outputs": [
+    "ALL_CATEGORICAL", 
+    "numeric_vars_without_fnlgwt",
+    "capgain_to_use",  
+    "cartesian_hours_marital_status",
+    "quantile_bin(NUMERIC_VARS_QB_500,500)",
+    "quantile_bin(NUMERIC_VARS_QB_10,10)",
+    "quantile_bin(into_5_bins,5)"
+  ]
+}
