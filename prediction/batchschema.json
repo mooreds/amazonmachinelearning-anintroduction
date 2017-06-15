@@ -1,0 +1,52 @@
+{
+  "version" : "1.0",
+  "rowId" : null,
+  "rowWeight" : null,
+  "targetAttributeName" : null,
+  "dataFormat" : "CSV",
+  "dataFileContainsHeader" : true,
+  "attributes" : [ {
+    "attributeName" : "age",
+    "attributeType" : "NUMERIC"
+  }, {
+    "attributeName" : "workclass",
+    "attributeType" : "CATEGORICAL"
+  }, {
+    "attributeName" : "fnlwgt",
+    "attributeType" : "NUMERIC"
+  }, {
+    "attributeName" : "education",
+    "attributeType" : "CATEGORICAL"
+  }, {
+    "attributeName" : "education-num",
+    "attributeType" : "NUMERIC"
+  }, {
+    "attributeName" : "marital-status",
+    "attributeType" : "CATEGORICAL"
+  }, {
+    "attributeName" : "occupation",
+    "attributeType" : "CATEGORICAL"
+  }, {
+    "attributeName" : "relationship",
+    "attributeType" : "CATEGORICAL"
+  }, {
+    "attributeName" : "race",
+    "attributeType" : "CATEGORICAL"
+  }, {
+    "attributeName" : "sex",
+    "attributeType" : "CATEGORICAL"
+  }, {
+    "attributeName" : "capital-gain",
+    "attributeType" : "NUMERIC"
+  }, {
+    "attributeName" : "capital-loss",
+    "attributeType" : "NUMERIC"
+  }, {
+    "attributeName" : "hours-per-week",
+    "attributeType" : "NUMERIC"
+  }, {
+    "attributeName" : "native-country",
+    "attributeType" : "CATEGORICAL"
+  } ],
+  "excludedAttributeNames" : [ ]
+}
