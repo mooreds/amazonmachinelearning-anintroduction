@@ -11,7 +11,7 @@ def lookup_by_tag(key,val):
   for model in res['Results']:
     tags_response = client.describe_tags(ResourceId=model['MLModelId'], ResourceType=resource_type)
     for tag in tags_response['Tags']:
-      if tag['Key'] == 'envt' and tag['Value'] == 'prod-income':
+      if tag['Key'] == key and tag['Value'] == val:
         model_id = model['MLModelId']
         endpoint_url = model['EndpointInfo']['EndpointUrl']
         return [model_id,endpoint_url]
