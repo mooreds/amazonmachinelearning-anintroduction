@@ -2,7 +2,7 @@ import boto3
 
 client = boto3.client('machinelearning')
 
-model_name = 'ML model: Adult V4'
+model_name = 'ML model: Adult Income V1'
 res = client.describe_ml_models(FilterVariable='Name', EQ=model_name)
 
 model_id = res['Results'][0]['MLModelId']
