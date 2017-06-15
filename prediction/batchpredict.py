@@ -2,11 +2,11 @@ import boto3
 import json
 import re
 
-
 ml_bucket = 'aml-an-intro'
 batch_data_location = 'batch-prediction-upload/adultincomebatch1.csv'
 schema_data_location = 'batch-prediction-upload/adultincomebatchschema.json'
 
+# load data
 s3 = boto3.resource('s3')
 
 with open('adulttotest.csv', 'r') as data:
@@ -15,9 +15,10 @@ with open('adulttotest.csv', 'r') as data:
 with open('batchschema.json', 'r') as schema:
   s3.Bucket(ml_bucket).put_object(Key=schema_data_location, Body=schema)
 
+# create data source
 client = boto3.client('machinelearning')
 
-datasource_id = 'ds-adult-income-v1-batch-2'
+datasource_id = 'ds-adult-income-v1-batch-3'
 
 response = client.create_data_source_from_s3(
         DataSourceId=datasource_id,
@@ -29,17 +30,19 @@ response = client.create_data_source_from_s3(
         ComputeStatistics=False
 )
 
+# look up the model id
 model_name = 'ML model: Adult Income V1'
 
 res = client.describe_ml_models(FilterVariable='Name', EQ=model_name)
 
 model_id = res['Results'][0]['MLModelId']
 
+# create the batch prediction
 output_prefix = 'batch-prediction-results/adult-income-v1'
 output_uri = 's3://'+ml_bucket+'/'+output_prefix
 response = client.create_batch_prediction(
         BatchPredictionId='batch2adultincomev1',
-        BatchPredictionName='Batch 2 Adult Income v1',
+        BatchPredictionName='Batch 3 Adult Income v1',
         MLModelId=model_id,
         BatchPredictionDataSourceId=datasource_id,
         OutputUri=output_uri
@@ -48,6 +51,7 @@ response = client.create_batch_prediction(
 batch_id = response['BatchPredictionId']
 #print batch_id
 
+# wait for batch prediction to finish
 waiter = client.get_waiter('batch_prediction_available')
 waiter.wait(FilterVariable='DataSourceId', EQ=datasource_id)
 
@@ -57,10 +61,15 @@ batch_response = client.get_batch_prediction(
 
 #print batch_response['Status']
 
+# download the manifest
 bucket = s3.Bucket(ml_bucket)
 manifest_path = output_prefix +'/batch-prediction/'+batch_id+'.manifest'
 bucket.download_file(manifest_path, '/tmp/manifest')
 
+# sample manifest output:
+# {"s3://aml-an-intro/batch-prediction-upload/adultincomebatch1.csv":"s3://aml-an-intro/batch-prediction-results/adult-income-v1/batch-prediction/result/batch2adultincomev1-adultincomebatch1.csv.gz"}
+
+# parse the manifest and download the file
 output_location_key = 's3://'+ml_bucket+"/"+batch_data_location 
 with open('/tmp/manifest', 'r') as myfile:
   manifest_content=myfile.read().replace('\n', '')
