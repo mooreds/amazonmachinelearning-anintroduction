@@ -12,7 +12,7 @@
             "Condition": {
                 "StringLike": {
                     "s3:prefix": [
-                        "batch-prediction-upload/adulttotest.csv*"
+                        "batch-prediction-upload/*"
                     ]
                 }
             }
@@ -25,7 +25,7 @@
             },
             "Action": "s3:GetObject",
             "Resource": [
-                "arn:aws:s3:::aml-an-intro/batch-prediction-upload/adulttotest.csv*"
+                "arn:aws:s3:::aml-an-intro/batch-prediction-upload/*"
             ]
         },
         {
