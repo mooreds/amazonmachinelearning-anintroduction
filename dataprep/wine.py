@@ -9,6 +9,7 @@ def fix_for_batch(line):
   return line
 
 training_number_of_lines = 3898
+reminder = open('make-sure-you-mark-quality-as-categorical', 'w') 
 tobatch = open('whitetotest.csv', 'w') 
 totrain = open('whitetotrain.csv', 'w') 
 with open('winequality-white.csv') as f:
