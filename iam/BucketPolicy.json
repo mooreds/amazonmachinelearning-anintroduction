@@ -12,6 +12,7 @@
             "Condition": {
                 "StringLike": {
                     "s3:prefix": [
+                        "adult-income/*",
                         "batch-prediction-upload/*"
                     ]
                 }
@@ -25,6 +26,7 @@
             },
             "Action": "s3:GetObject",
             "Resource": [
+                "arn:aws:s3:::aml-an-intro/adult-income/*",
                 "arn:aws:s3:::aml-an-intro/batch-prediction-upload/*"
             ]
         },
