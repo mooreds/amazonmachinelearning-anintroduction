@@ -64,6 +64,7 @@ response = client.create_data_source_from_s3(
         ComputeStatistics=False
 )
 
+print "creating data sources"
 waiter = client.get_waiter('data_source_available')
 waiter.wait(FilterVariable='Name', EQ=training_datasource_name)
 waiter = client.get_waiter('data_source_available')
@@ -87,13 +88,14 @@ training_parameters = current_prod_model_verbose['TrainingParameters']
 new_model_id = 'ml-adult-income-v2-'+timestamp
 response = client.create_ml_model(
     MLModelId=new_model_id,
-    MLModelName='Adult Income V2',
+    MLModelName='Adult Income V2 Model',
     MLModelType=ml_model_type,
     Parameters=training_parameters,
     TrainingDataSourceId=training_datasource_id,
     Recipe=recipe
 )
 
+print "creating model"
 # waiting for model to finish building
 waiter = client.get_waiter('ml_model_available')
 waiter.wait(FilterVariable='TrainingDataSourceId', EQ=training_datasource_id)
@@ -120,8 +122,9 @@ response = client.create_evaluation(
     EvaluationDataSourceId=eval_datasource_id
 )
 
+print "creating evaluation of new model"
 waiter = client.get_waiter('evaluation_available')
-waiter.wait(FilterVariable='MlModelId', EQ=new_model_id)
+waiter.wait(FilterVariable='MLModelId', EQ=new_model_id)
 
 # print AUC of both new and old
 
