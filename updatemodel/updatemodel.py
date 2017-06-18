@@ -130,11 +130,13 @@ waiter.wait(FilterVariable='MLModelId', EQ=new_model_id)
 
 old_auc = retrieve_auc(old_model_id, client)
 new_auc = retrieve_auc(new_model_id, client)
+print "old auc: "+str(old_auc)
+print "new auc: "+str(new_auc)
 
-sys.exit()
 # add tags
 # move the production tag from the old system to the new.
 # unfortunately no way to make this transactional
+print "moving production tag to new model: "+new_model_id
 response = client.add_tags(
     Tags=[
         {
@@ -153,8 +155,4 @@ response = client.delete_tags(
     ResourceId=old_model_id,
     ResourceType='MLModel'
 )
-
-
-sys.exit()
-
 
