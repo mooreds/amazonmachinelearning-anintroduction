@@ -3,33 +3,7 @@ import json
 import re
 import time
 
-ml_bucket = 'aml-an-intro'
-data_location = 'adult-income/data/'
-schema_data_location = 'adult-income/updateschema.json'
-
-# create data source
-client = boto3.client('machinelearning')
-
-timestamp = str(int(time.time()))
-
-# unique names: http://docs.aws.amazon.com/machine-learning/latest/dg/names-and-ids-for-all-objects.html
-datasource_id = 'ds-adult-income-v2-training-'+timestamp
-datasource_name='Adult Income V2 Training/'+timestamp
-
-response = client.create_data_source_from_s3(
-        DataSourceId=datasource_id,
-        DataSourceName=datasource_name,
-        DataSpec={
-          'DataLocationS3': 's3://'+ml_bucket+"/"+data_location,
-          'DataSchemaLocationS3': 's3://'+ml_bucket+"/"+schema_data_location
-        },
-        ComputeStatistics=True
-)
-
-waiter = client.get_waiter('data_source_available')
-waiter.wait(FilterVariable='Name', EQ=datasource_name)
-
-def lookup_by_tag(key,val):
+def lookup_by_tag(key, val, client):
   res = client.describe_ml_models(FilterVariable='MLModelType', EQ='BINARY')
   resource_type = 'MLModel'
   model_id = None
@@ -41,11 +15,65 @@ def lookup_by_tag(key,val):
         model_id = model['MLModelId']
         return model_id
 
+def retrieve_auc(model_id, client):
+  response = client.describe_evaluations(
+      FilterVariable='MLModelId',
+      EQ=old_model_id
+  )
+
+  auc = response['Results'][0]['PerformanceMetrics']['Properties']['BinaryAUC']
+  return auc
+
+ml_bucket = 'aml-an-intro'
+data_location = 'adult-income/data/'
+schema_data_location = 'adult-income/updateschema.json'
+
+# create data source
+client = boto3.client('machinelearning')
+
+timestamp = str(int(time.time()))
+
+# unique names: http://docs.aws.amazon.com/machine-learning/latest/dg/names-and-ids-for-all-objects.html
+training_datasource_id = 'ds-adult-income-v2-training-'+timestamp
+training_datasource_name='Adult Income V2 Training DS/'+timestamp
+training_data_rearrangment = '{ "splitting": { "percentBegin": 0, "percentEnd": 70 } }'
+
+eval_datasource_id = 'ds-adult-income-v2-eval-'+timestamp
+eval_datasource_name='Adult Income V2 Eval DS/'+timestamp
+eval_data_rearrangment = '{ "splitting": { "percentBegin": 70, "percentEnd": 100 } }'
+
+response = client.create_data_source_from_s3(
+        DataSourceId=training_datasource_id,
+        DataSourceName=training_datasource_name,
+        DataSpec={
+          'DataLocationS3': 's3://'+ml_bucket+"/"+data_location,
+          'DataSchemaLocationS3': 's3://'+ml_bucket+"/"+schema_data_location,
+          'DataRearrangement': training_data_rearrangment
+        },
+        ComputeStatistics=True
+)
+
+response = client.create_data_source_from_s3(
+        DataSourceId=eval_datasource_id,
+        DataSourceName=eval_datasource_name,
+        DataSpec={
+          'DataLocationS3': 's3://'+ml_bucket+"/"+data_location,
+          'DataSchemaLocationS3': 's3://'+ml_bucket+"/"+schema_data_location,
+          'DataRearrangement': eval_data_rearrangment
+        },
+        ComputeStatistics=False
+)
+
+waiter = client.get_waiter('data_source_available')
+waiter.wait(FilterVariable='Name', EQ=training_datasource_name)
+waiter = client.get_waiter('data_source_available')
+waiter.wait(FilterVariable='Name', EQ=eval_datasource_name)
+
 # look up current prod model id
-model_id = lookup_by_tag('envt','prod-income')
+old_model_id = lookup_by_tag('envt','prod-income', client)
 
 current_prod_model_verbose = client.get_ml_model(
-        MLModelId=model_id,
+        MLModelId=old_model_id,
         Verbose=True
 )
 
@@ -62,25 +90,67 @@ response = client.create_ml_model(
     MLModelName='Adult Income V2',
     MLModelType=ml_model_type,
     Parameters=training_parameters,
-    TrainingDataSourceId=datasource_id,
+    TrainingDataSourceId=training_datasource_id,
     Recipe=recipe
 )
 
 # waiting for model to finish building
 waiter = client.get_waiter('ml_model_available')
-waiter.wait(FilterVariable='TrainingDataSourceId', EQ=datasource_id)
+waiter.wait(FilterVariable='TrainingDataSourceId', EQ=training_datasource_id)
 
-new_model = client.get_batch_prediction(
-        MLModel_Id=new_model_id
+new_model = client.get_ml_model(
+        MLModelId=new_model_id
 )
 
-print new_model
+#print new_model
 
-# update score threshold
+# update score threshold via update
+response = client.update_ml_model(
+    MLModelId=new_model_id,
+    ScoreThreshold=score_threshold
+)
+# do evaluation
 
+evaluation_id = 'ev-adult-income-v2-'+timestamp
+evaluation_name='Adult Income V2 Eval/'+timestamp
+response = client.create_evaluation(
+    EvaluationId=evaluation_id,
+    EvaluationName=evaluation_name,
+    MLModelId=new_model_id,
+    EvaluationDataSourceId=eval_datasource_id
+)
+
+waiter = client.get_waiter('evaluation_available')
+waiter.wait(FilterVariable='MlModelId', EQ=new_model_id)
+
+# print AUC of both new and old
+
+old_auc = retrieve_auc(old_model_id, client)
+new_auc = retrieve_auc(new_model_id, client)
+
+sys.exit()
 # add tags
+# move the production tag from the old system to the new.
+# unfortunately no way to make this transactional
+response = client.add_tags(
+    Tags=[
+        {
+            'Key': 'envt',
+            'Value': 'prod-income'
+        },
+    ],
+    ResourceId=new_model_id,
+    ResourceType='MLModel'
+)
 
-# update score threshold
+response = client.delete_tags(
+    TagKeys=[
+        'envt'
+    ],
+    ResourceId=old_model_id,
+    ResourceType='MLModel'
+)
+
 
 sys.exit()
 
