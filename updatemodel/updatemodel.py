@@ -18,7 +18,7 @@ def lookup_by_tag(key, val, client):
 def retrieve_auc(model_id, client):
   response = client.describe_evaluations(
       FilterVariable='MLModelId',
-      EQ=old_model_id
+      EQ=model_id
   )
 
   auc = response['Results'][0]['PerformanceMetrics']['Properties']['BinaryAUC']
@@ -136,12 +136,16 @@ print "new auc: "+str(new_auc)
 # add tags
 # move the production tag from the old system to the new.
 # unfortunately no way to make this transactional
-print "moving production tag to new model: "+new_model_id
+print "moving production tag from "+old_model_id+" to new model: "+new_model_id
 response = client.add_tags(
     Tags=[
         {
             'Key': 'envt',
             'Value': 'prod-income'
+        },
+        {
+            'Key': 'prod-timestamp',
+            'Value': timestamp
         },
     ],
     ResourceId=new_model_id,
