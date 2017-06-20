@@ -11,5 +11,6 @@ AMI with open source machine learning software installed: https://aws.amazon.com
 Non AWS options:
 
 Google Cloud Machine Learning Engine: https://cloud.google.com/ml-engine/
+Azure Machine Learining: https://azure.microsoft.com/en-us/services/machine-learning/
 Scikit-learn (python, open source, machine learning framework): http://scikit-learn.org/stable/
 List of machine learning APIs: http://www.kdnuggets.com/2017/02/machine-learning-data-science-apis-updated.html
