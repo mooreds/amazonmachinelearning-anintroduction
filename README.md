@@ -2,7 +2,7 @@ Code for Amazon Machine Learning: An Introduction
 
 https://leanpub.com/amazonmachinelearning-anintroduction/
 
-And a video course (URL, TBD).
+And a video course: https://www.safaribooksonline.com/library/view/introduction-to-amazon/9781491991138/
 
 Make sure you install boto3
 
